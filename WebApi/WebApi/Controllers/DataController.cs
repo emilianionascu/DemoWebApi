@@ -1,7 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Data;
 using Entities.EntityModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Models.RequestModels;
 
 namespace WebApi.Controllers
@@ -34,6 +36,22 @@ namespace WebApi.Controllers
             await this.dbContext.SaveChangesAsync();
 
             return this.NoContent();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetRequests()
+        {
+            var requests = await this.dbContext.Requests.ToListAsync();
+
+            var toReturn = requests.Select(x => new RequestModel
+            {
+                Index = x.Index,
+                Name = x.Name,
+                Date = x.Date,
+                Visits = x.Visits
+            });
+
+            return this.Ok(toReturn);
         }
     }
 }
